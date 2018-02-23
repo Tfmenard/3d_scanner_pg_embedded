@@ -1,6 +1,6 @@
 #include <Encoder.h>
 #include <PID_v1.h>
-
+#include "Motor_Library/Motor.h";
 int PWM = 4, InA1 = 5, InB1 = 6;
 int PWM_val = 0;
 Encoder myEnc(2, 3);
