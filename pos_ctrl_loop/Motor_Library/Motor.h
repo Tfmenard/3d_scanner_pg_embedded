@@ -1,5 +1,5 @@
 /*
-  Motor.h - Library for flashing Motor code. 
+  Motor.h - Library for flashing Motor code.  
   */
 #ifndef Motor_h
 #define Motor_h
