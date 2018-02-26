@@ -4,22 +4,23 @@
 #ifndef Motor_h
 #define Motor_h
 
+
 #include "Arduino.h"
 
 class Motor
 {
   public:
-    char motorID, motorDirection, motorPosition, motorSpeed;//class variables
+    char motorID, motorDirection, motorPosition;//member variables
     double speedPercentage;
     int pwm;//speed
     
     //class functions
-    Motor(char command, char id, char mDirection, char mPosition, char mSpeed);
+    Motor(char id, char mDirection, char mPosition);
     void goForward();
     void goBackward();
     void go();//this function works according to the set direction
-    void setMotorSpeed(char inputMotorSpeed);
     void setMotorDirection(char inputMotorDirection);
+	void setupPins();
     void stopMotor(); 
 
     //functions not used:
@@ -29,7 +30,7 @@ class Motor
 
     //variables not used:
     //command
-  private:
+  public:
     int pwm_pin, InA, InB;
 };
 

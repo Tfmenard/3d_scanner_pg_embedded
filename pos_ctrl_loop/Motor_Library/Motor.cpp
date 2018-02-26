@@ -2,23 +2,15 @@
   Motor.cpp - Library for flashing Motor code.
 */
 
-#include "Arduino.h"
 #include "Motor.h"
 
-Motor::Motor(char command, char id, char mDirection, char mPosition, char mSpeed)
+Motor::Motor(char id, char mDirection, char mPosition)
 {
   motorID = id;
   motorDirection = mDirection;
   motorPosition = mPosition;
-  motorSpeed = mSpeed;
-  speedPercentage = (motorSpeed - '0')/10;// if 0, speed is 0, else pwm = 255*speedPercentage.
 
-   //set correct speed with pwm: (25% = 64; 50% = 127; 75% = 191; 100% = 255)
-  if (motorSpeed = '0')
-  {
-     pwm = 0; 
-  } else 
-     pwm = 255*speedPercentage; //transforming double to int
+    
     
   //set correct pins depending on ID: pwm, inA, inB. 
   if (motorID = 'l') 
@@ -34,11 +26,13 @@ Motor::Motor(char command, char id, char mDirection, char mPosition, char mSpeed
     pwm_pin = 3;
   }
 
+  setupPins();
+
 }
 
 void Motor::goForward()
 {
- analogWrite(pwm_pin, abs(pwm));  
+    analogWrite(pwm_pin, abs(pwm));  
     digitalWrite(InA, HIGH);
     digitalWrite(InB, LOW);
     motorDirection = '1';
@@ -46,7 +40,7 @@ void Motor::goForward()
 
 void Motor::goBackward()
 {
-  analogWrite(pwm_pin, abs(pwm));  
+    analogWrite(pwm_pin, abs(pwm));  
     digitalWrite(InA, LOW);
     digitalWrite(InB, HIGH);
     motorDirection = '2';
@@ -75,13 +69,14 @@ void Motor::go()
      
 }
 
-void Motor::setMotorSpeed(char inputSpeedPercentage)
-{
-  motorSpeed = inputSpeedPercentage;
-  speedPercentage = (motorSpeed - '0')/10;// if 0, speed is 0, else pwm = 255*speedPercentage.;
-  pwm = speedPercentage*255; 
-}
 void Motor::setMotorDirection(char inputMotorDirection)
 {
   motorDirection = inputMotorDirection;
+}
+
+void Motor::setupPins()
+{
+	pinMode(InA, OUTPUT);
+	pinMode(InB, OUTPUT);
+	pinMode(pwm_pin, OUTPUT);
 }
