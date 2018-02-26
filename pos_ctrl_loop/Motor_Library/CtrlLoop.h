@@ -12,18 +12,19 @@ CtrlLoop.h - Library to handle Motor, Encoder with PID Control computations.
 class CtrlLoop
 {
 public:
-	double Setpoint, Input, Output;
+	double& Setpoint, Input, Output;
 	double Kp = 5, Ki = 0, Kd = 0;
 	long oldPosition = -999;
 	long newPosition = -999;
-
+	char id;
+	
 	Encoder *encoder;
 	PID *pid;
 	Motor *motor;
 
 	//class functions
 	CtrlLoop(char id, Encoder *mEncoder, Motor *_motor, double K_p, double K_i, double K_d);
-	CtrlLoop(char id, Encoder *mEncoder, Motor *_motor, PID _pid);
+	CtrlLoop(char _id, Encoder *mEncoder, Motor *_motor, PID *_pid, double &_Setpoint, double &_Input, double &_Output);
 	void updatePosition();
 
 	void findMotorDirection();

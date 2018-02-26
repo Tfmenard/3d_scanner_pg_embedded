@@ -8,12 +8,13 @@ int PWM_val = 0;
 Encoder myEnc(2, 3);
 double Setpoint, Input, Output;
 double Kp = 5, Ki = 0, Kd = 0;
-//PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
 long oldPosition  = -999;
 bool pidComputed = false;
 
-Motor xMotor('d','d','d');
-CtrlLoop xCtrlLoop('X', &myEnc, &xMotor, Kp, Ki, Kd);
+PID xPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
+Motor xMotor('X','1','d');
+//CtrlLoop xCtrlLoop('X', &myEnc, &xMotor, Kp, Ki, Kd);
+CtrlLoop xCtrlLoop('X', &myEnc, &xMotor, &xPID, Setpoint, Input, Output);
 void setup() {
   Serial.begin(115200);
 

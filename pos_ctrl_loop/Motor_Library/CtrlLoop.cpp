@@ -1,16 +1,30 @@
 #include "CtrlLoop.h"
 #include "Arduino.h"
 
-
-CtrlLoop::CtrlLoop(char id, Encoder *mEncoder, Motor *_motor, double K_p, double K_i, double K_d)
+CtrlLoop::CtrlLoop(char _id, Encoder *mEncoder, Motor *_motor, PID *_pid, double &_Setpoint, double &_Input, double &_Output)
+: id(_id), encoder(mEncoder), motor(_motor), pid(_pid), Setpoint(_Setpoint), Input(_Input), Output(_Output)
 {
-	encoder = mEncoder;
-	PID _pid(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
-	_pid.SetMode(AUTOMATIC);
-	pid = &_pid;
-	motor = _motor;
+	pid->SetMode(AUTOMATIC);
 	this->Setpoint = 0;
 }
+
+//CtrlLoop::CtrlLoop(char id, Encoder *mEncoder, Motor *_motor, double K_p, double K_i, double K_d)
+//{
+	
+	//encoder = mEncoder;
+	
+	//TODO: Fix this section to initialize member object pid
+	//PID _pid(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
+	//_pid.SetMode(AUTOMATIC);
+	//pid = &_pid;
+	
+	//pid->SetMode(AUTOMATIC);
+	//motor = _motor;
+	
+	//TODO: Fix this by initializing Setpoint first
+	//this->Setpoint = 0;
+//}
+
 
 void CtrlLoop::updatePosition()
 {
