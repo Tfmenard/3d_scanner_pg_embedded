@@ -8,22 +8,21 @@ CtrlLoop::CtrlLoop(char _id, Encoder *mEncoder, Motor *_motor, PID *_pid, double
 	this->Setpoint = 0;
 }
 
-//CtrlLoop::CtrlLoop(char id, Encoder *mEncoder, Motor *_motor, double K_p, double K_i, double K_d)
-//{
-	
-	//encoder = mEncoder;
+CtrlLoop::CtrlLoop(char id, Encoder *mEncoder, Motor *_motor, double K_p, double K_i, double K_d)
+: id(id), encoder(mEncoder), motor(_motor)
+{
 	
 	//TODO: Fix this section to initialize member object pid
-	//PID _pid(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
+	pid = new PID (&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
 	//_pid.SetMode(AUTOMATIC);
 	//pid = &_pid;
 	
-	//pid->SetMode(AUTOMATIC);
+	pid->SetMode(AUTOMATIC);
 	//motor = _motor;
 	
 	//TODO: Fix this by initializing Setpoint first
-	//this->Setpoint = 0;
-//}
+	this->Setpoint = 0;
+}
 
 
 void CtrlLoop::updatePosition()

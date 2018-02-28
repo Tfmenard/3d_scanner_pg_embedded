@@ -27,9 +27,9 @@ Motor::Motor(char id, char mDirection, char mPosition)
   }
   else if(motorID = 'X')
   {
-	InA = 5;
-	InB = 6;
-	pwm_pin = 4;
+	InA = 26;
+	InB = 27;
+	pwm_pin = 2;
   }
 
   setupPins();
