@@ -12,7 +12,7 @@ CtrlLoop.h - Library to handle Motor, Encoder with PID Control computations.
 class CtrlLoop
 {
 public:
-	double& Setpoint, Input, Output;
+	double Setpoint = 0, Input = 0, Output = 0;
 	double Kp = 5, Ki = 0, Kd = 0;
 	long oldPosition = -999;
 	long newPosition = -999;
