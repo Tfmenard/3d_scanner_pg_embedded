@@ -86,6 +86,10 @@ void loop() {
          Serial.print("Updated setpoint on base motor: ");
          Serial.print(base_ctrlLoop.Setpoint);
          Serial.print('\n');
+         Serial.print("Base controller loop setpoint is ");
+         Serial.print('\n');
+         Serial.print(base_ctrlLoop.Setpoint);
+         Serial.print('\n');
          Serial.print("Done");
          Serial.print('\n');
          
