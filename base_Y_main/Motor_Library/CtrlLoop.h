@@ -33,6 +33,8 @@ public:
 	void findMotorDirection();
 	bool updatePID();
 
+	void homing();
+
 	void go();//this function works according to the set direction
 	void setMotorSpeed(char inputMotorSpeed);
 	void setMotorDirection(char inputMotorDirection);

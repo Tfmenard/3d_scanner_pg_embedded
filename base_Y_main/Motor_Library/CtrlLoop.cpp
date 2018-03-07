@@ -62,3 +62,22 @@ void CtrlLoop::findMotorDirection()
 //		Serial.print("Go forward");
 	}
 }
+
+
+void CtrlLoop::homing()
+{
+	this->pid->SetMode(MANUAL);
+
+	this->motor->pwm = 100;
+	this->motor->goBackward();
+	
+	while (digitalRead(30) == 0)
+	{
+	}
+
+	encoder->write(0);
+	Setpoint = 0;
+	
+	this->motor->stopMotor();
+	this ->pid->SetMode(AUTOMATIC);
+}

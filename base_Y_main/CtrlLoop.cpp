@@ -62,3 +62,22 @@ void CtrlLoop::findMotorDirection()
 //		Serial.print("Go forward");
 	}
 }
+
+
+void CtrlLoop::homing()
+{
+	this->pid->SetMode(MANUAL);
+
+	this->motor->pwm = 50;
+	this->motor->goBackward();
+	
+	while (digitalRead(30) == 0)
+	{
+	}
+
+	encoder->write(0);//setpoing = 0 and encoder = 0 might be causing voltage source clipping. it was fixed with changing these values from 0 to 0.5 (or higher).
+	Setpoint = 0;
+	
+	this->motor->stopMotor();
+	this ->pid->SetMode(AUTOMATIC);
+}

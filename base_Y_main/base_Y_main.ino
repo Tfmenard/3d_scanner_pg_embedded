@@ -6,7 +6,7 @@
    Y Motor: pwm pin(3), InA(36), InB(37)
    Encoder Base: pin (18,19)
    Encoder Y: pin (20,21)
-   
+
 */
 #include "Motor_Library/CtrlLoop.h"
 
@@ -40,17 +40,17 @@ void setup() {
 }
 
 void loop() {
-  
+
   base_ctrlLoop.updatePosition();
   Y_ctrlLoop.updatePosition();
   base_ctrlLoop.findMotorDirection();
   Y_ctrlLoop.findMotorDirection();
-  
+
   while (Serial.available() > 0)
-  { 
+  {
     PC_input = Serial.readStringUntil('\n');
     execute_command(PC_input);//here parse pc command and execute it
-  
+
   }
 
   pidComputedBase = base_ctrlLoop.pid->Compute();//must run once in every void loop iteration
@@ -75,59 +75,63 @@ void loop() {
 
 void execute_command(String command)
 {
-   //splitting PC_input:
-    device = getValue(command, ',', 0);
-    string_id = getValue(command, ',', 1);
-    value = getValue(command, ',', 2);
+  //splitting PC_input:
+  device = getValue(command, ',', 0);
+  string_id = getValue(command, ',', 1);
+  value = getValue(command, ',', 2);
 
-    //converting strings to appropriate type for controlLoop class
-    desiredPosition = value.toDouble();
+  //converting strings to appropriate type for controlLoop class
+  desiredPosition = value.toDouble();
 
-   if (device == "M") //motor command
+  if (device == "M") //motor command
+  {
+    if (string_id == "B")// Base motor selected
     {
-      if (string_id == "B")// Base motor selected
+      if (value == "H") {
+        base_ctrlLoop.homing();
+
+
+      } else
       {
         base_ctrlLoop.Setpoint = desiredPosition;//for base motor (base control loop)
-        Serial.print("Updated setpoint on base motor: ");
-        Serial.print(base_ctrlLoop.Setpoint);
-        Serial.print('\n');
-        Serial.print("Done");
-        Serial.print('\n');
 
-      } else if (string_id == "Y")//Y motor selected
+        //        Serial.print("MCD,B,");
+        //        Serial.print(base_ctrlLoop.Setpoint);
+        //        Serial.print('\n');
+      }
+
+    } else if (string_id == "Y")//Y motor selected
+      if (value == "H") {
+        Y_ctrlLoop.homing();
+
+      } else
       {
         Y_ctrlLoop.Setpoint = desiredPosition;//for Y motor (Y control loop)
-        Serial.print("Updated setpoint on Y motor: ");
-        Serial.print(Y_ctrlLoop.Setpoint);
-        Serial.print('\n');
-        Serial.print("Done");
-        Serial.print('\n');
 
+        //        Serial.print("MCD,Y,");
+        //        Serial.print(Y_ctrlLoop.Setpoint);
+        //        Serial.print('\n');
       }
-    } else if (device == "E") //encoder command
+  } else if (device == "E") //encoder command
+  {
+    if (string_id == "B")
     {
-      if (string_id == "B")
-      {
-        Serial.print("Base encoder position value is ");
-        Serial.print(base_ctrlLoop.Input);
-        Serial.print('\n');
-        Serial.print("Done");
-        Serial.print('\n');
+      Serial.print("ECD,B,");
+      Serial.print(base_ctrlLoop.Input);
+      Serial.print('\n');
 
-      } else if (string_id == "Y")
-      {
-        Serial.print("Y encoder position value is ");
-        Serial.print(Y_ctrlLoop.Input);
-        Serial.print('\n');
-        Serial.print("Done");
-        Serial.print('\n');
-      }
-    } else //invalid command
-      { 
-        Serial.print("Invalid command. Format must be: Device,ID,Position ");
-        Serial.print('\n');
-      }
-  
+    } else if (string_id == "Y")
+    {
+      Serial.print("ECD,Y,");
+      Serial.print(Y_ctrlLoop.Input);
+      Serial.print('\n');
+    }
+  } else //invalid command
+  {
+    Serial.print("Invalid command. Format must be: Device,ID,Position ");
+    Serial.print('\n');
+  }
+
 
 }
 
@@ -136,11 +140,11 @@ void printIfCloseEnough(CtrlLoop control_loop)//prints back done signal when mot
   bool close_enough = (control_loop.Input > (control_loop.Setpoint - positionThreshold)) && (control_loop.Input  < (control_loop.Setpoint + positionThreshold));
   if (close_enough)
   {
-    Serial.print("Motor ");
+    //DM,B,encoder_position and end with \n
+    Serial.print("DM,");//done motor signal
     Serial.print(string_id);
-    Serial.print(" is within threshold");
-    Serial.print('\n');
-    Serial.print("Done");
+    Serial.print(",");
+    Serial.print(control_loop.Input);
     Serial.print('\n');
 
     //Reset values to only print values once

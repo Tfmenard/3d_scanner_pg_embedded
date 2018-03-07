@@ -87,6 +87,13 @@ void Motor::go()
      
 }
 
+void Motor::stopMotor()
+{
+    analogWrite(pwm_pin, abs(pwm));  
+    digitalWrite(InA, LOW);
+    digitalWrite(InB, LOW);
+}
+
 void Motor::setMotorDirection(char inputMotorDirection)
 {
   motorDirection = inputMotorDirection;
