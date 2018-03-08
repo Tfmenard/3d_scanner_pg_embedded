@@ -7,7 +7,21 @@
    Servo: 11
    
  */
-#include "Motor_Library/CtrlLoop.h"
+
+
+
+// Change this path to include libraries
+#define PROJECT_ROOT C:\Users\royni\Desktop\3d_scanner_pg_embedded-message-cmds\libraries
+
+#define TO_STRING(s) #s
+#define ABSOLUTE_PATH(root, relative_path) TO_STRING(root\relative_path)
+#define RELATIVE_PATH(library) ABSOLUTE_PATH(PROJECT_ROOT, library)
+
+#include RELATIVE_PATH(CtrlLoop.h)
+#include RELATIVE_PATH(CtrlLoop.cpp)
+#include RELATIVE_PATH(Motor.h)
+#include RELATIVE_PATH(Motor.cpp)
+ 
 #include <Servo.h>
 
 int PWM_pin_X = 2;
@@ -76,7 +90,7 @@ void execute_command(String command)
     {
       if (string_id == "X")// X motor selected
       {
-        X_ctrlLoop.Setpoint = desiredPosition;//for X motor (X motor control loop)
+        X_ctrlLoop.Setpoint = desiredPosition*X_motor.gear_ratio;//for X motor (X motor control loop)
         Serial.print("Updated setpoint on X motor: ");
         Serial.print(X_ctrlLoop.Setpoint);
         Serial.print('\n');

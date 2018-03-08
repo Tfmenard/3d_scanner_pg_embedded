@@ -8,7 +8,19 @@
    Encoder Y: pin (20,21)
 
 */
-#include "Motor_Library/CtrlLoop.h"
+
+
+// Change this path to include libraries
+#define PROJECT_ROOT C:\Users\royni\Desktop\3d_scanner_pg_embedded-message-cmds\libraries
+
+#define TO_STRING(s) #s
+#define ABSOLUTE_PATH(root, relative_path) TO_STRING(root\relative_path)
+#define RELATIVE_PATH(library) ABSOLUTE_PATH(PROJECT_ROOT, library)
+
+#include RELATIVE_PATH(CtrlLoop.h)
+#include RELATIVE_PATH(CtrlLoop.cpp)
+#include RELATIVE_PATH(Motor.h)
+#include RELATIVE_PATH(Motor.cpp)
 
 int PWM_pin_base = 2;
 int PWM_pin_Y = 3;
@@ -93,7 +105,7 @@ void execute_command(String command)
 
       } else
       {
-        base_ctrlLoop.Setpoint = desiredPosition;//for base motor (base control loop)
+        base_ctrlLoop.Setpoint = desiredPosition*Y_motor.gear_ratio;//for base motor (base control loop)
 
         //        Serial.print("MCD,B,");
         //        Serial.print(base_ctrlLoop.Setpoint);
@@ -106,7 +118,8 @@ void execute_command(String command)
 
       } else
       {
-        Y_ctrlLoop.Setpoint = desiredPosition;//for Y motor (Y control loop)
+        double Y_gear_ratio = Y_motor.gear_ratio;
+        Y_ctrlLoop.Setpoint = desiredPosition * Y_gear_ratio;//for Y motor (Y control loop)
 
         //        Serial.print("MCD,Y,");
         //        Serial.print(Y_ctrlLoop.Setpoint);
