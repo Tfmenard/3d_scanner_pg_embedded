@@ -1,6 +1,6 @@
 /*
    This file handles Motor 3 and Motor 4: X and Servo Motors
-   Author: Gabriel Chootong
+   Author: Gabriel Chootong a.k.a gchoot
    Date: March 6, 2018
    Motor X: pwm pin(2), InA(26), InB(27)
    Encoder X: 18,19
@@ -11,7 +11,7 @@
 
 
 // Change this path to include libraries
-#define PROJECT_ROOT C:\Users\royni\Desktop\3d_scanner_pg_embedded-message-cmds\libraries
+#define PROJECT_ROOT C:\Users\royni\Documents\GitHub\3d_scanner_pg_embedded\libraries
 
 #define TO_STRING(s) #s
 #define ABSOLUTE_PATH(root, relative_path) TO_STRING(root\relative_path)
