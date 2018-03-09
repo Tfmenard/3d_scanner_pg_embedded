@@ -5,14 +5,8 @@
    Motor X: pwm pin(2), InA(26), InB(27)
    Encoder X: 18,19
    Servo: 11
-<<<<<<< HEAD
 
 */
-#include "Motor_Library/CtrlLoop.h"
-#include "Motor_Library/Motor.h"
-=======
-   
- */
 
 
 
@@ -28,7 +22,6 @@
 #include RELATIVE_PATH(Motor.h)
 #include RELATIVE_PATH(Motor.cpp)
  
->>>>>>> 7699d58fff20470e15fc8e0b122fd1fc1554acc9
 #include <Servo.h>
 
 int PWM_pin_X = 2;
