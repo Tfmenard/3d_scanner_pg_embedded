@@ -44,21 +44,40 @@ void CtrlLoop::findMotorDirection()
 	if (Setpoint < Input)
 	{
 		pid->SetControllerDirection(REVERSE);
-		Serial.print("Reverse controller mode");
+//		Serial.print("Reverse controller mode");
 
 		//TODO: replace with goBackward function
 		motor->goBackward();
 
 		//xMotor.goForward();
 
-		Serial.print("GO backward");
+//		Serial.print("Go backward");
 	}
 	else
 	{
 		pid->SetControllerDirection(DIRECT);
-		Serial.print("DIRECT Controller Mode");
+//		Serial.print("DIRECT Controller Mode");
 		//TODO: replace with goBackward function
 		motor->goForward();
-		Serial.print("Go forward");
+//		Serial.print("Go forward");
 	}
+}
+
+
+void CtrlLoop::homing()
+{
+	this->pid->SetMode(MANUAL);
+
+	this->motor->pwm = 100;
+	this->motor->goBackward();
+	
+	while (digitalRead(30) == 0)
+	{
+	}
+
+	encoder->write(0);
+	Setpoint = 0;
+	
+	this->motor->stopMotor();
+	this ->pid->SetMode(AUTOMATIC);
 }

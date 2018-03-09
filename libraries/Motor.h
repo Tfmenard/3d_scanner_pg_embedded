@@ -1,5 +1,5 @@
 /*
-  Motor.h - Library for flashing Motor code.  
+  Motor.h - Library for flashing Motor code.    
   */
 #ifndef Motor_h
 #define Motor_h
@@ -12,7 +12,8 @@ class Motor
   public:
     char motorID, motorDirection, motorPosition;//member variables
     double speedPercentage;
-    int pwm;//speed
+    int pwm;	//speed
+    double gear_ratio;
     
     //class functions
     Motor(char id, char mDirection, char mPosition);

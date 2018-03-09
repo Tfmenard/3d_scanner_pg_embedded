@@ -13,23 +13,38 @@ Motor::Motor(char id, char mDirection, char mPosition)
     
     
   //set correct pins depending on ID: pwm, inA, inB. 
-  if (motorID = 'l') 
+  if (motorID == 'l') 
   {
     InA = 26;
     InB = 27;
     pwm_pin = 2;
   }
-  else if (motorID = '2')
+  else if (motorID == '2')
   {
     InA = 36;
     InB = 37;
     pwm_pin = 3;
   }
-  else if(motorID = 'X')
+  else if(motorID == 'X')
   {
 	InA = 26;
 	InB = 27;
 	pwm_pin = 2;
+	gear_ratio = 178.9553218;
+  }
+  else if(motorID == 'B')
+  {
+  	InA = 26;
+  	InB = 27;
+  	pwm_pin = 2;
+  	gear_ratio = 5.688888889;
+  }
+  else if(motorID == 'Y')
+  {
+  	InA = 36;
+  	InB = 37;
+  	pwm_pin = 3;
+	gear_ratio = 175.618569;
   }
 
   setupPins();
@@ -54,25 +69,32 @@ void Motor::goBackward()
 
 void Motor::go()
 {
-  if (motorDirection = '1')//go forward
+  if (motorDirection == '1')//go forward
   {
     analogWrite(pwm_pin, abs(pwm));  
     digitalWrite(InA, HIGH);
     digitalWrite(InB, LOW);
    } 
-   else if (motorDirection = '2')//go backward
+   else if (motorDirection == '2')//go backward
    {
     analogWrite(pwm_pin, abs(pwm));  
     digitalWrite(InA, LOW);
     digitalWrite(InB, HIGH);
    }
-   else if (motorDirection = '0')
+   else if (motorDirection == '0')
    {
     analogWrite(pwm_pin, abs(pwm));  
     digitalWrite(InA, LOW);
     digitalWrite(InB, LOW);
    }  
      
+}
+
+void Motor::stopMotor()
+{
+    analogWrite(pwm_pin, abs(pwm));  
+    digitalWrite(InA, LOW);
+    digitalWrite(InB, LOW);
 }
 
 void Motor::setMotorDirection(char inputMotorDirection)

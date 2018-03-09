@@ -1,5 +1,8 @@
 /*
 CtrlLoop.h - Library to handle Motor, Encoder with PID Control computations.
+input: reading from encoder
+setpoint (desired position)
+output: computed by pid
 */
 #ifndef CtrlLoop_h
 #define CtrlLoop_h
@@ -29,6 +32,8 @@ public:
 
 	void findMotorDirection();
 	bool updatePID();
+
+	void homing();
 
 	void go();//this function works according to the set direction
 	void setMotorSpeed(char inputMotorSpeed);
