@@ -98,7 +98,7 @@ void execute_command(String command)
 
       } else
       {
-        X_ctrlLoop.Setpoint = desiredPosition;//for base motor (base control loop)
+        X_ctrlLoop.Setpoint = desiredPosition*X_motor.gear_ratio;//for X Motor (X motor control loop)
 
         //        Serial.print("MCD,B,");
         //        Serial.print(base_ctrlLoop.Setpoint);
