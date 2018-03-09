@@ -7,7 +7,20 @@ Things to do:
 - check all parameters are correct type (on this .ino and on the library) i.e. string-string, char-char...
 - call motors X, Y, S, B. encoders are called E. check this
 */
-#include "Motor_Library/CtrlLoop.h"
+
+
+
+// Change this path to include libraries
+#define PROJECT_ROOT C:\Users\royni\Documents\GitHub\3d_scanner_pg_embedded\libraries
+
+#define TO_STRING(s) #s
+#define ABSOLUTE_PATH(root, relative_path) TO_STRING(root\relative_path)
+#define RELATIVE_PATH(library) ABSOLUTE_PATH(PROJECT_ROOT, library)
+
+#include RELATIVE_PATH(CtrlLoop.h)
+#include RELATIVE_PATH(CtrlLoop.cpp)
+#include RELATIVE_PATH(Motor.h)
+#include RELATIVE_PATH(Motor.cpp)
 
 int PWM_pin_base = 2, InA1 = 26, InB1 = 27;
 int PWM_pin_Y = 3;

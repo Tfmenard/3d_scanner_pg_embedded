@@ -30,18 +30,21 @@ Motor::Motor(char id, char mDirection, char mPosition)
 	InA = 26;
 	InB = 27;
 	pwm_pin = 2;
+	gear_ratio = 178.9553218;
   }
   else if(motorID == 'B')
   {
-  InA = 26;
-  InB = 27;
-  pwm_pin = 2;
+  	InA = 26;
+  	InB = 27;
+  	pwm_pin = 2;
+  	gear_ratio = 5.688888889;
   }
   else if(motorID == 'Y')
   {
-  InA = 36;
-  InB = 37;
-  pwm_pin = 3;
+  	InA = 36;
+  	InB = 37;
+  	pwm_pin = 3;
+	gear_ratio = 175.618569;
   }
 
   setupPins();

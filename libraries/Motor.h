@@ -12,7 +12,8 @@ class Motor
   public:
     char motorID, motorDirection, motorPosition;//member variables
     double speedPercentage;
-    int pwm;//speed
+    int pwm;	//speed
+    double gear_ratio;
     
     //class functions
     Motor(char id, char mDirection, char mPosition);
