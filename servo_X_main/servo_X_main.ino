@@ -91,8 +91,10 @@ void execute_command(String command)
   {
     if (string_id == "X")// X motor selected
     {
-      if (value == "H")
+      if (value == "H")//here add code to do homing of servo then homing of control loop - both together.
       {
+        servo_motor.write(90);
+        delay(4000);//camera delay
         X_ctrlLoop.homing();
 
 
