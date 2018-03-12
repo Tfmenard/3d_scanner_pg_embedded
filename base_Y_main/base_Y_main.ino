@@ -11,8 +11,7 @@
 
 
 // Change this path to include libraries
-#define PROJECT_ROOT C:\Users\royni\Documents\GitHub\3d_scanner_pg_embedded\libraries
-
+#define PROJECT_ROOT C:\Users\Gabriel\Desktop\Deberes McGill\DP2\Github\3d_scanner_pg_embedded\libraries
 #define TO_STRING(s) #s
 #define ABSOLUTE_PATH(root, relative_path) TO_STRING(root\relative_path)
 #define RELATIVE_PATH(library) ABSOLUTE_PATH(PROJECT_ROOT, library)
@@ -105,7 +104,7 @@ void execute_command(String command)
 
       } else
       {
-        base_ctrlLoop.Setpoint = desiredPosition*Y_motor.gear_ratio;//for base motor (base control loop)
+        base_ctrlLoop.Setpoint = desiredPosition*base_motor.gear_ratio;//for base motor (base control loop) 
 
         //        Serial.print("MCD,B,");
         //        Serial.print(base_ctrlLoop.Setpoint);
