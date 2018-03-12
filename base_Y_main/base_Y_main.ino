@@ -71,16 +71,16 @@ void loop() {
   analogWrite(PWM_pin_base, base_ctrlLoop.Output);
 
   //send motor done signal if motor is close enough
-  if (device == "M")
-  {
-    if (string_id == "B")
-    {
-      printIfCloseEnough(base_ctrlLoop);
-    }
-  } else if (string_id == "Y")
-  {
-    printIfCloseEnough(Y_ctrlLoop);
-  }
+//  if (device == "M")
+//  {
+//    if (string_id == "B")
+//    {
+//      printIfCloseEnough(base_ctrlLoop);
+//    }
+//  } else if (string_id == "Y")
+//  {
+//    printIfCloseEnough(Y_ctrlLoop);
+//  }
 
 }
 
