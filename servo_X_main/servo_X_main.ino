@@ -11,7 +11,7 @@
 
 
 // Change this path to include libraries
-#define PROJECT_ROOT C:\Users\Gabriel\Desktop\Deberes McGill\DP2\Github\3d_scanner_pg_embedded\libraries
+#define PROJECT_ROOT C:\Users\Tfmenard\Documents\GitHub\3d_scanner_pg_embedded\libraries
 
 #define TO_STRING(s) #s
 #define ABSOLUTE_PATH(root, relative_path) TO_STRING(root\relative_path)
@@ -35,9 +35,11 @@ CtrlLoop X_ctrlLoop('B', &X_encoder, &X_motor, Kp, Ki, Kd);
 
 String PC_input, device, string_id, value;
 double desiredPosition;
-double positionThreshold = 0.1;
+double positionThreshold = 0.6;
 char id;
 long encoder_position;
+
+bool xMotor_moving = false;
 
 void setup() {
   Serial.begin(115200);
@@ -65,6 +67,8 @@ void loop() {
   pidComputedX = X_ctrlLoop.pid->Compute();//must run once in every void loop iteration
   analogWrite(PWM_pin_X, X_ctrlLoop.Output);
 
+  isCloseEnough(X_ctrlLoop);
+  
   //send motor done signal if motor is close enough
   if (device == "M")
   {
@@ -73,6 +77,7 @@ void loop() {
       printIfCloseEnough(X_ctrlLoop);
     }
   }
+
 
 }
 
@@ -99,6 +104,7 @@ void execute_command(String command)
       } else
       {
         X_ctrlLoop.Setpoint = desiredPosition*X_motor.gear_ratio;//for X Motor (X motor control loop)
+        xMotor_moving = true;
 
         //        Serial.print("MCD,B,");
         //        Serial.print(base_ctrlLoop.Setpoint);
@@ -110,7 +116,7 @@ void execute_command(String command)
     if (string_id == "X")
     {
       Serial.print("ECD,X,");
-      Serial.print(X_ctrlLoop.Input);
+      Serial.print(X_ctrlLoop.Input/X_motor.gear_ratio);
       Serial.print('\n');
 
     } else if (string_id == "S")
@@ -129,8 +135,8 @@ void execute_command(String command)
     Serial.print('\n');
   } else //invalid command
   {
-    Serial.print("Invalid command. Format must be: Device,ID,Position ");
-    Serial.print('\n');
+    //Serial.print("Invalid command. Format must be-> Device:ID:Position ");
+    //Serial.print('\n');
   }
 
 
@@ -152,6 +158,40 @@ void printIfCloseEnough(CtrlLoop control_loop)//prints back done signal when mot
     device = "";
     string_id = "";
     value = "";
+  }
+}
+
+void isCloseEnough(CtrlLoop control_loop)//prints back done signal when motor is close enough to desired position
+{
+  bool close_enough = (control_loop.Input > (control_loop.Setpoint - positionThreshold)) && (control_loop.Input  < (control_loop.Setpoint + positionThreshold));
+  if(xMotor_moving && close_enough)
+  {
+    //Print status
+    Serial.print("ECD,X,");
+    Serial.print(X_ctrlLoop.Input/X_motor.gear_ratio);
+    Serial.print(',');
+    Serial.print('\n');
+     xMotor_moving = false; 
+  }
+  
+  if (close_enough)
+  {
+    
+    xMotor_moving = false;
+    //Reset values to only print values once
+    device = "";
+    string_id = "";
+    value = "";
+  }
+  else
+  {
+    if(xMotor_moving)
+    {
+      //Print status
+      Serial.print("ECD,X,");
+      Serial.print(X_ctrlLoop.Input/X_motor.gear_ratio);
+      Serial.print(',');
+      Serial.print('\n');    }
   }
 }
 
