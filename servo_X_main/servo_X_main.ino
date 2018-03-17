@@ -39,7 +39,6 @@ double positionThreshold = 0.6;
 char id;
 long encoder_position;
 
-bool xMotor_moving = false;
 
 void setup() {
   Serial.begin(115200);
@@ -67,7 +66,7 @@ void loop() {
   pidComputedX = X_ctrlLoop.pid->Compute();//must run once in every void loop iteration
   analogWrite(PWM_pin_X, X_ctrlLoop.Output);
 
-  isCloseEnough(X_ctrlLoop);
+  X_ctrlLoop.sendFBackStreamIfMoving();
   
   //send motor done signal if motor is close enough
   if (device == "M")
@@ -104,7 +103,7 @@ void execute_command(String command)
       } else
       {
         X_ctrlLoop.Setpoint = desiredPosition*X_motor.gear_ratio;//for X Motor (X motor control loop)
-        xMotor_moving = true;
+        X_motor.isMoving = true;
 
         //        Serial.print("MCD,B,");
         //        Serial.print(base_ctrlLoop.Setpoint);
@@ -164,20 +163,20 @@ void printIfCloseEnough(CtrlLoop control_loop)//prints back done signal when mot
 void isCloseEnough(CtrlLoop control_loop)//prints back done signal when motor is close enough to desired position
 {
   bool close_enough = (control_loop.Input > (control_loop.Setpoint - positionThreshold)) && (control_loop.Input  < (control_loop.Setpoint + positionThreshold));
-  if(xMotor_moving && close_enough)
+  if(X_motor.isMoving && close_enough)
   {
     //Print status
     Serial.print("ECD,X,");
     Serial.print(X_ctrlLoop.Input/X_motor.gear_ratio);
     Serial.print(',');
     Serial.print('\n');
-     xMotor_moving = false; 
+     X_motor.isMoving = false; 
   }
   
   if (close_enough)
   {
     
-    xMotor_moving = false;
+    X_motor.isMoving = false;
     //Reset values to only print values once
     device = "";
     string_id = "";
@@ -185,7 +184,7 @@ void isCloseEnough(CtrlLoop control_loop)//prints back done signal when motor is
   }
   else
   {
-    if(xMotor_moving)
+    if(X_motor.isMoving)
     {
       //Print status
       Serial.print("ECD,X,");

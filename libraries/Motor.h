@@ -14,6 +14,7 @@ class Motor
     double speedPercentage;
     int pwm;	//speed
     double gear_ratio;
+	bool isMoving = false;
     
     //class functions
     Motor(char id, char mDirection, char mPosition);
