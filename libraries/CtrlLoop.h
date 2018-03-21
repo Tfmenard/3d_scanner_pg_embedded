@@ -43,6 +43,7 @@ public:
 	void setupPins();
 	void stopMotor();
 	void sendFBackStreamIfMoving();
+	void sendFeedBackStatus(String cmd_id);
 
 	//functions not used:
 	//void goToPosition(double desiredPosition);

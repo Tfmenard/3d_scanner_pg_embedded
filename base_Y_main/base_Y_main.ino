@@ -1,3 +1,5 @@
+#include <PacketSerial.h>
+
 /*
    This file handles Motor 1 and Motor 2 (both DC motors): Base and Y Motors
    Author: Gabriel Chootong
@@ -43,13 +45,14 @@ char id;
 long encoder_position;
 
 void setup() {
+  
   Serial.begin(115200);
 
   base_ctrlLoop.updatePosition();
   Y_ctrlLoop.updatePosition();
 
-  Serial.println("Ready");
-
+  //Serial.println("Ready");
+  
 }
 
 void loop() {
@@ -110,6 +113,10 @@ void execute_command(String command)
 
 
       } 
+      else if(value == "R")
+      {
+        base_ctrlLoop.motor->isMoving = false; 
+      }
       else
       {
         base_ctrlLoop.Setpoint = desiredPosition*base_motor.gear_ratio;//for base motor (base control loop) 
@@ -127,7 +134,7 @@ void execute_command(String command)
         Y_ctrlLoop.homing();
 
       }
-      else if(value == "Rx")
+      else if(value == "R")
       {
         Y_ctrlLoop.motor->isMoving = false; 
       }
@@ -140,6 +147,14 @@ void execute_command(String command)
         //        Serial.print("MCD,Y,");
         //        Serial.print(Y_ctrlLoop.Setpoint);
         //        Serial.print('\n');
+        //uint16_t posAsUint16 = static_cast<uint16_t>(desiredPosition + 0.5);
+        //uint8_t head = (uint8_t)((posAsUint16 & 0xFF00) >> 8);
+        //uint8_t tail = (uint8_t)(posAsUint16 & 0xFF00);
+        //uint8_t packet[9] = {'D', 'M', 'C', ',', 'Y', ',', head, tail};
+        //uint16_t combo = (uint8_t) head << 8
+        //serialPacketObj.send(packet, 9);
+        
+        
       }
     }
   } 
