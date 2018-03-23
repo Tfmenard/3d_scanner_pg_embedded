@@ -11,7 +11,7 @@
 
 
 // Change this path to include libraries
-#define PROJECT_ROOT C:\Users\Gabriel\Desktop\Deberes McGill\DP2\Github\3d_scanner_pg_embedded\libraries
+#define PROJECT_ROOT C:\Users\Tfmenard\Documents\GitHub\3d_scanner_pg_embedded\libraries
 #define TO_STRING(s) #s
 #define ABSOLUTE_PATH(root, relative_path) TO_STRING(root\relative_path)
 #define RELATIVE_PATH(library) ABSOLUTE_PATH(PROJECT_ROOT, library)
@@ -20,6 +20,8 @@
 #include RELATIVE_PATH(CtrlLoop.cpp)
 #include RELATIVE_PATH(Motor.h)
 #include RELATIVE_PATH(Motor.cpp)
+
+
 
 int PWM_pin_base = 2;
 int PWM_pin_Y = 3;
@@ -31,23 +33,24 @@ bool pidComputedBase = false;
 bool pidComputedY = false;
 Motor base_motor('B', '1', 'd');
 Motor Y_motor('Y', '1', 'd');
-CtrlLoop base_ctrlLoop('B', &base_encoder, &base_motor, Kp, Ki, Kd);
+CtrlLoop base_ctrlLoop('B', &base_encoder, &base_motor, 100, Ki, Kd);
 CtrlLoop Y_ctrlLoop('Y', &Y_encoder, &Y_motor, Kp, Ki, Kd);
 
 String PC_input, device, string_id, value;
 double desiredPosition;
-double positionThreshold = 0.1;
+double positionThreshold = 0.6;
 char id;
 long encoder_position;
 
 void setup() {
+  
   Serial.begin(115200);
 
   base_ctrlLoop.updatePosition();
   Y_ctrlLoop.updatePosition();
 
-  Serial.println("Ready");
-
+  //Serial.println("Ready");
+  
 }
 
 void loop() {
@@ -70,17 +73,22 @@ void loop() {
   analogWrite(PWM_pin_Y, Y_ctrlLoop.Output);
   analogWrite(PWM_pin_base, base_ctrlLoop.Output);
 
-  //send motor done signal if motor is close enough
+  Y_ctrlLoop.sendFBackStreamIfMoving();
+  base_ctrlLoop.sendFBackStreamIfMoving();
+
+  //send motor done signal if motor is close enough.
+  //TODO: Implement asynchronous on receiving to use this asynchronous motor done command.
   if (device == "M")
   {
     if (string_id == "B")
     {
-      printIfCloseEnough(base_ctrlLoop);
+      //printIfCloseEnough(base_ctrlLoop);
     }
-  } else if (string_id == "Y")
-  {
-    printIfCloseEnough(Y_ctrlLoop);
-  }
+    else if (string_id == "Y")
+    {
+      //printIfCloseEnough(Y_ctrlLoop);
+    }
+  } 
 
 }
 
@@ -98,33 +106,46 @@ void execute_command(String command)
   {
     if (string_id == "B")// Base motor selected
     {
-      if (value == "H") {
+      if (value == "H") 
+      {
         base_ctrlLoop.homing();
-
-
-      } else
+      } 
+      else if(value == "R")
+      {
+        base_ctrlLoop.motor->isMoving = false; 
+      }
+      else
       {
         base_ctrlLoop.Setpoint = desiredPosition*base_motor.gear_ratio;//for base motor (base control loop) 
-
+        base_motor.isMoving = true;
+        //Command received status
+        //TODO: Implement protocol on receiving end before using this status.
         //        Serial.print("MCD,B,");
         //        Serial.print(base_ctrlLoop.Setpoint);
         //        Serial.print('\n');
       }
 
-    } else if (string_id == "Y")//Y motor selected
-      if (value == "H") {
+    } 
+    else if (string_id == "Y")//Y motor selected
+    {
+      if (value == "H") 
+      {
         Y_ctrlLoop.homing();
 
-      } else
+      }
+      else if(value == "R")
+      {
+        Y_ctrlLoop.motor->isMoving = false; 
+      }
+      else
       {
         double Y_gear_ratio = Y_motor.gear_ratio;
         Y_ctrlLoop.Setpoint = desiredPosition * Y_gear_ratio;//for Y motor (Y control loop)
-
-        //        Serial.print("MCD,Y,");
-        //        Serial.print(Y_ctrlLoop.Setpoint);
-        //        Serial.print('\n');
+        Y_motor.isMoving = true;
       }
-  } else if (device == "E") //encoder command
+    }
+  } 
+  else if (device == "E") //encoder command
   {
     if (string_id == "B")
     {
@@ -132,16 +153,19 @@ void execute_command(String command)
       Serial.print(base_ctrlLoop.Input);
       Serial.print('\n');
 
-    } else if (string_id == "Y")
+    } 
+    else if (string_id == "Y")
     {
       Serial.print("ECD,Y,");
       Serial.print(Y_ctrlLoop.Input);
       Serial.print('\n');
     }
-  } else //invalid command
+  } 
+  else //invalid command
   {
-    Serial.print("Invalid command. Format must be: Device,ID,Position ");
-    Serial.print('\n');
+    //Not used as not necessary on receiving end
+    //Serial.print("Invalid command. Format must be: Device:ID:Position ");
+    //Serial.print('\n');
   }
 
 
@@ -150,19 +174,16 @@ void execute_command(String command)
 void printIfCloseEnough(CtrlLoop control_loop)//prints back done signal when motor is close enough to desired position
 {
   bool close_enough = (control_loop.Input > (control_loop.Setpoint - positionThreshold)) && (control_loop.Input  < (control_loop.Setpoint + positionThreshold));
-  if (close_enough)
+  if (control_loop.motor->isMoving && close_enough)
   {
-    //DM,B,encoder_position and end with \n
-    Serial.print("DM,");//done motor signal
-    Serial.print(string_id);
-    Serial.print(",");
-    Serial.print(control_loop.Input);
-    Serial.print('\n');
-
-    //Reset values to only print values once
-    device = "";
-    string_id = "";
-    value = "";
+    String cmd = "DM,";
+    cmd += control_loop.motor->motorID;
+    cmd += ',';
+    cmd += control_loop.Input/control_loop.motor->gear_ratio;
+    cmd += ',';
+    cmd += '\n';
+    Serial.print(cmd);
+    control_loop.motor->isMoving = false;
   }
 }
 

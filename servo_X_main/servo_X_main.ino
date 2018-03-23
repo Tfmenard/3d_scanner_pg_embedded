@@ -11,7 +11,7 @@
 
 
 // Change this path to include libraries
-#define PROJECT_ROOT C:\Users\Gabriel\Desktop\Deberes McGill\DP2\Github\3d_scanner_pg_embedded\libraries
+#define PROJECT_ROOT C:\Users\Tfmenard\Documents\GitHub\3d_scanner_pg_embedded\libraries
 
 #define TO_STRING(s) #s
 #define ABSOLUTE_PATH(root, relative_path) TO_STRING(root\relative_path)
@@ -33,11 +33,16 @@ bool pidComputedX = false;
 Motor X_motor('X', '1', 'd');
 CtrlLoop X_ctrlLoop('B', &X_encoder, &X_motor, Kp, Ki, Kd);
 
+Motor servo_motor_fake('S', '1', 'd');
+CtrlLoop servo_ctrlLoop('S', &X_encoder, &servo_motor_fake, Kp, Ki, Kd);
+
+
 String PC_input, device, string_id, value;
 double desiredPosition;
-double positionThreshold = 0.1;
+double positionThreshold = 0.6;
 char id;
 long encoder_position;
+
 
 void setup() {
   Serial.begin(115200);
@@ -46,7 +51,7 @@ void setup() {
 
   servo_motor.attach(11);//attaches servo on pin 11 to the servo object.
 
-  Serial.println("Ready");
+  //Serial.println("Ready");
 
 }
 
@@ -59,20 +64,23 @@ void loop() {
   {
     PC_input = Serial.readStringUntil('\n');//read input from pc
     execute_command(PC_input);//here parse pc command and execute it
-
   }
 
   pidComputedX = X_ctrlLoop.pid->Compute();//must run once in every void loop iteration
   analogWrite(PWM_pin_X, X_ctrlLoop.Output);
 
+  X_ctrlLoop.sendFBackStreamIfMoving();
+  servo_ctrlLoop.sendFBackStreamIfMoving();
+  
   //send motor done signal if motor is close enough
   if (device == "M")
   {
     if (string_id == "X")
     {
-      printIfCloseEnough(X_ctrlLoop);
+      //printIfCloseEnough(X_ctrlLoop);
     }
   }
+
 
 }
 
@@ -94,43 +102,63 @@ void execute_command(String command)
       if (value == "H")
       {
         X_ctrlLoop.homing();
-
-
-      } else
+      }
+      else if(value == "R")
+      {
+        X_ctrlLoop.motor->isMoving = false; 
+      }
+      else
       {
         X_ctrlLoop.Setpoint = desiredPosition*X_motor.gear_ratio;//for X Motor (X motor control loop)
-
+        X_motor.isMoving = true;
         //        Serial.print("MCD,B,");
         //        Serial.print(base_ctrlLoop.Setpoint);
         //        Serial.print('\n');
       }
     }
-  } else if (device == "E") //encoder command
+    else if (string_id == "S") //servo command
+    {
+      if (value == "H")
+      {
+        //TODO: Homing for servo
+        //servo_ctrlLoop.homing();
+      }
+      else if(value == "R")
+      {
+        servo_ctrlLoop.motor->isMoving = false; 
+      }
+      else
+      {
+        servo_motor.write(desiredPosition);
+        servo_motor_fake.isMoving = true;
+        delay(2000);//camera delay
+  
+        //Serial.print("MCD,S,");
+        //Serial.print(servo_motor.read());
+        //Serial.print('\n');
+      }
+    }
+  } 
+  else if (device == "E") //encoder command
   {
     if (string_id == "X")
     {
       Serial.print("ECD,X,");
-      Serial.print(X_ctrlLoop.Input);
+      Serial.print(X_ctrlLoop.Input/X_motor.gear_ratio);
       Serial.print('\n');
 
-    } else if (string_id == "S")
+    } 
+    else if (string_id == "S")
     {
       Serial.print("ECD,S,");
       Serial.print(servo_motor.read());
       Serial.print('\n');
     }
-  } else if (device == "S") //servo command
+  }  
+  else //invalid command
   {
-    servo_motor.write(desiredPosition);
-    delay(2000);//camera delay
-
-    Serial.print("MCD,S,");
-    Serial.print(servo_motor.read());
-    Serial.print('\n');
-  } else //invalid command
-  {
-    Serial.print("Invalid command. Format must be: Device,ID,Position ");
-    Serial.print('\n');
+    //Serial.print("Invalid command. Format must be-> Device:ID:Position ");
+    //Serial.print('\n');
   }
 
 
