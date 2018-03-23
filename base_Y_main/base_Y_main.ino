@@ -1,5 +1,3 @@
-#include <PacketSerial.h>
-
 /*
    This file handles Motor 1 and Motor 2 (both DC motors): Base and Y Motors
    Author: Gabriel Chootong
@@ -71,14 +69,15 @@ void loop() {
 
   pidComputedBase = base_ctrlLoop.pid->Compute();//must run once in every void loop iteration
   pidComputedY = Y_ctrlLoop.pid->Compute();//must run once in every void loop iteration
-  
+
   analogWrite(PWM_pin_Y, Y_ctrlLoop.Output);
   analogWrite(PWM_pin_base, base_ctrlLoop.Output);
 
   Y_ctrlLoop.sendFBackStreamIfMoving();
   base_ctrlLoop.sendFBackStreamIfMoving();
 
-  //send motor done signal if motor is close enough
+  //send motor done signal if motor is close enough.
+  //TODO: Implement asynchronous on receiving to use this asynchronous motor done command.
   if (device == "M")
   {
     if (string_id == "B")
@@ -110,8 +109,6 @@ void execute_command(String command)
       if (value == "H") 
       {
         base_ctrlLoop.homing();
-
-
       } 
       else if(value == "R")
       {
@@ -121,6 +118,8 @@ void execute_command(String command)
       {
         base_ctrlLoop.Setpoint = desiredPosition*base_motor.gear_ratio;//for base motor (base control loop) 
         base_motor.isMoving = true;
+        //Command received status
+        //TODO: Implement protocol on receiving end before using this status.
         //        Serial.print("MCD,B,");
         //        Serial.print(base_ctrlLoop.Setpoint);
         //        Serial.print('\n');
@@ -143,18 +142,6 @@ void execute_command(String command)
         double Y_gear_ratio = Y_motor.gear_ratio;
         Y_ctrlLoop.Setpoint = desiredPosition * Y_gear_ratio;//for Y motor (Y control loop)
         Y_motor.isMoving = true;
-
-        //        Serial.print("MCD,Y,");
-        //        Serial.print(Y_ctrlLoop.Setpoint);
-        //        Serial.print('\n');
-        //uint16_t posAsUint16 = static_cast<uint16_t>(desiredPosition + 0.5);
-        //uint8_t head = (uint8_t)((posAsUint16 & 0xFF00) >> 8);
-        //uint8_t tail = (uint8_t)(posAsUint16 & 0xFF00);
-        //uint8_t packet[9] = {'D', 'M', 'C', ',', 'Y', ',', head, tail};
-        //uint16_t combo = (uint8_t) head << 8
-        //serialPacketObj.send(packet, 9);
-        
-        
       }
     }
   } 
@@ -176,6 +163,7 @@ void execute_command(String command)
   } 
   else //invalid command
   {
+    //Not used as not necessary on receiving end
     //Serial.print("Invalid command. Format must be: Device:ID:Position ");
     //Serial.print('\n');
   }
@@ -188,7 +176,6 @@ void printIfCloseEnough(CtrlLoop control_loop)//prints back done signal when mot
   bool close_enough = (control_loop.Input > (control_loop.Setpoint - positionThreshold)) && (control_loop.Input  < (control_loop.Setpoint + positionThreshold));
   if (control_loop.motor->isMoving && close_enough)
   {
-
     String cmd = "DM,";
     cmd += control_loop.motor->motorID;
     cmd += ',';
@@ -197,55 +184,6 @@ void printIfCloseEnough(CtrlLoop control_loop)//prints back done signal when mot
     cmd += '\n';
     Serial.print(cmd);
     control_loop.motor->isMoving = false;
-    //DM,B,encoder_position and end with \n
-    //Serial.print(string_id);
-    //Serial.print(",");
-    //Serial.print(control_loop.Input);
-    //Serial.print('\n');
-
-    //Reset values to only print values once
-    //device = "";
-    //string_id = "";
-    //value = "";
-  }
-}
-
-void isCloseEnough(CtrlLoop control_loop)//prints back done signal when motor is close enough to desired position
-{
-  bool close_enough = (control_loop.Input > (control_loop.Setpoint - positionThreshold)) && (control_loop.Input  < (control_loop.Setpoint + positionThreshold));
-  if(control_loop.motor->isMoving && close_enough)
-  {
-    //Print status
-    //Serial.print("ECD,");
-    //Serial.print(control_loop.motor->motorID);
-    //Serial.print(',');
-    //Serial.print(control_loop.Input/control_loop.motor->gear_ratio);
-    //Serial.print(',');
-    //Serial.print('\n');
-    //control_loop.motor->isMoving = false; 
-  }
-  
-  if (close_enough)
-  {
-    
-    //control_loop.motor->isMoving = false;
-    //Reset values to only print values once
-    device = "";
-    string_id = "";
-    value = "";
-  }
-  else
-  {
-    if(control_loop.motor->isMoving)
-    {
-      //Print status
-      Serial.print("ECD,");
-      Serial.print(control_loop.motor->motorID);
-      Serial.print(',');
-      Serial.print(control_loop.Input/control_loop.motor->gear_ratio);
-      Serial.print(',');
-      Serial.print('\n');
-     }
   }
 }
 

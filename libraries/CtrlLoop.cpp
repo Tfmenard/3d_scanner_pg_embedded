@@ -87,95 +87,25 @@ void CtrlLoop::sendFBackStreamIfMoving()//Streams encoder position only when the
   bool close_enough = (Input > (Setpoint - posThreshold)) && (Input  < (Setpoint + posThreshold));
   if(motor->isMoving && close_enough)
   {
-    //Print status
-     // Serial.print("ECD,");
-	 // Serial.print(motor->motorID);
-	 // Serial.print(',');
-      //Serial.print(Input/motor->gear_ratio);
-      //Serial.print(',');
-      //Serial.print('\n'); 
-	  
-	//String cmd = "DMC,";
-    //cmd += motor->motorID;
-    //cmd += ',';
-    //cmd += Input/motor->gear_ratio;
-    //cmd += ',';
-    //cmd += '\n';
-	//Serial.print(cmd);
-	
-	//Print status
-	//String cmdStringHead = "DMC,";
-	//cmdStringHead += motor->motorID;
-	//cmdStringHead += ',';
-	//double posAsDouble = Input/motor->gear_ratio;
-	//uint16_t posAsUint16 = static_cast<uint16_t>(posAsDouble + 0.5);
-	//String cmdStringTail = ",";
-	//char delim = '}';
-	//Serial.print(cmdStringHead);
-	
-	//double dividerAsDouble = posAsDouble/120.0;
-	//uint8_t dividerAsInt = (uint8_t)dividerAsDouble;
-	
-	//int posAsInt = (int)posAsDouble;
-	//int remainderAsInt = posAsInt%120;
-	//uint8_t remainder = (uint8_t)remainderAsInt;
-	//uint8_t posHead = dividerAsInt;
-	//uint8_t posTail = remainder;
-	
-	
-    //posHead = (uint8_t)((posAsUint16 & 0xFF00) >> 8);
-    //posTail = (uint8_t)(posAsUint16 & 0x00FF);
-	
-	//Serial.write(posHead);
-	//Serial.write(posTail);
-	//Serial.print(cmdStringTail);
-	//Serial.write(delim);
-	
-	//sendFeedBackStatus("DMC,");
+    //Send current position status
 	sendFeedBackStatus("ECD,");
-    //motor->isMoving = false; 
   }
   
   if (close_enough)
   {
     
-    //motor->isMoving = false;
-    //Reset values to only print values once
-    //device = "";
-    //string_id = "";
-    //value = "";
+    //do nothing
   }
   else if(motor->isMoving && !close_enough)
   {
-		//Print status
-		/*String cmdStringHead = "ECD,";
-		cmdStringHead += motor->motorID;
-		cmdStringHead += ',';
-		double posAsDouble = Input/motor->gear_ratio;
-		uint16_t posAsUint16 = static_cast<uint16_t>(posAsDouble + 0.5);
-		String cmdStringTail = ",";
-		cmdStringTail += '}';
-		streamCounter = (streamCounter++)%10;
-		
-		uint8_t posHead = (uint8_t)((posAsUint16 & 0xFF00) >> 8);
-		uint8_t posTail = (uint8_t)(posAsUint16 & 0x00FF);
-		
-		if(streamCounter == 0)
-		{
-			Serial.print(cmdStringHead);
-			Serial.write(posHead);
-			Serial.write(posTail);
-			Serial.print(cmdStringTail);
-
-		}
-		*/		
+	    //Send current position status
 		sendFeedBackStatus("ECD,");
   }
 }
 
 void CtrlLoop::sendFeedBackStatus(String cmd_id)
 {
-	//Print status
+	//Print current position status
 	String cmdStringHead = cmd_id;
 	cmdStringHead += motor->motorID;
 	cmdStringHead += ',';
