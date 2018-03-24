@@ -50,7 +50,7 @@ void setup() {
   Y_ctrlLoop.updatePosition();
   pinMode(switchPin, INPUT_PULLUP);
 
-  //Serial.println("Ready");
+  Serial.println("Ready");
  
 }
 
@@ -69,6 +69,8 @@ void loop() {
   }
   
   Y_ctrlLoop.checkIfHomingDone(switchPin);
+ 
+
   
   pidComputedBase = base_ctrlLoop.pid->Compute();//must run once in every void loop iteration
   pidComputedY = Y_ctrlLoop.pid->Compute();//must run once in every void loop iteration
@@ -76,8 +78,8 @@ void loop() {
   analogWrite(PWM_pin_Y, Y_ctrlLoop.Output);
   analogWrite(PWM_pin_base, base_ctrlLoop.Output);
 
-  Y_ctrlLoop.sendFBackStreamIfMoving();
-  base_ctrlLoop.sendFBackStreamIfMoving();
+  //Y_ctrlLoop.sendFBackStreamIfMoving();
+  //base_ctrlLoop.sendFBackStreamIfMoving();
 
 }
 
@@ -115,7 +117,7 @@ void execute_command(String command)
       if (value == "H") 
         {
           Y_ctrlLoop.homing();
-          base_ctrlLoop.homing(); 
+          base_ctrlLoop.homing();
         }
       else if(value == "R")
       {
@@ -124,7 +126,7 @@ void execute_command(String command)
       else
       {
         double Y_gear_ratio = Y_motor.gear_ratio;
-        Y_ctrlLoop.Setpoint = desiredPosition * Y_gear_ratio;//for Y motor (Y control loop)
+        Y_ctrlLoop.Setpoint = -desiredPosition * Y_gear_ratio;//for Y motor (Y control loop). negative sign to ensure correct motor direction of Y motor
         Y_motor.isMoving = true;
       }
     }
@@ -134,14 +136,14 @@ void execute_command(String command)
     if (string_id == "B")
     {
       Serial.print("ECD,B,");
-      Serial.print(base_ctrlLoop.Input);
+      Serial.print(base_ctrlLoop.Input/base_motor.gear_ratio);
       Serial.print('\n');
 
     } 
     else if (string_id == "Y")
     {
       Serial.print("ECD,Y,");
-      Serial.print(Y_ctrlLoop.Input);
+      Serial.print(Y_ctrlLoop.Input/Y_motor.gear_ratio);
       Serial.print('\n');
     }
   } 

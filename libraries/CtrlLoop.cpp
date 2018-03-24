@@ -65,17 +65,25 @@ void CtrlLoop::findMotorDirection()
 
 
 void CtrlLoop::homing()
+{	
+	if (id == 'Y')
+{
+isHoming = true;
+Setpoint = (999999);//to ensure that Y motor rotates in the right direction
+} 
+else
 {
 	isHoming = true;
 	Setpoint = (-999999);//arbitrary long distance
 	
-	if (id = 'B')
+	if (id == 'B')
 	{
 		encoder->write(0);
           Setpoint = 0;
           isHoming = false;
 
 	}
+}
 }
 
 void CtrlLoop::checkIfHomingDone(int switchPin)
