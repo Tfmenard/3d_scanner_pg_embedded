@@ -36,17 +36,19 @@ CtrlLoop Y_ctrlLoop('Y', &Y_encoder, &Y_motor, Kp, Ki, Kd);
 
 String PC_input, device, string_id, value;
 double desiredPosition;
-double positionThreshold = 0.1;
+double positionThreshold = 0.6;
 char id;
 long encoder_position;
+int switchPin = 30;
 
 void setup() {
   Serial.begin(115200);
 
   base_ctrlLoop.updatePosition();
   Y_ctrlLoop.updatePosition();
+  pinMode(switchPin, INPUT_PULLUP);
 
-  Serial.println("Ready");
+//  Serial.println("Ready");
 
 }
 
@@ -63,24 +65,14 @@ void loop() {
     execute_command(PC_input);//here parse pc command and execute it
 
   }
-
+  
+  Y_ctrlLoop.checkIfHomingDone(switchPin);
+  
   pidComputedBase = base_ctrlLoop.pid->Compute();//must run once in every void loop iteration
   pidComputedY = Y_ctrlLoop.pid->Compute();//must run once in every void loop iteration
 
   analogWrite(PWM_pin_Y, Y_ctrlLoop.Output);
   analogWrite(PWM_pin_base, base_ctrlLoop.Output);
-
-  //send motor done signal if motor is close enough
-//  if (device == "M")
-//  {
-//    if (string_id == "B")
-//    {
-//      printIfCloseEnough(base_ctrlLoop);
-//    }
-//  } else if (string_id == "Y")
-//  {
-//    printIfCloseEnough(Y_ctrlLoop);
-//  }
 
 }
 
@@ -98,33 +90,41 @@ void execute_command(String command)
   {
     if (string_id == "B")// Base motor selected
     {
-      if (value == "H") {
-        base_ctrlLoop.homing();
+      if(value == "R")
+      {
 
-
-      } else
+      }
+      else
       {
         base_ctrlLoop.Setpoint = desiredPosition*base_motor.gear_ratio;//for base motor (base control loop) 
 
+        //Command received status
+        //TODO: Implement protocol on receiving end before using this status.
         //        Serial.print("MCD,B,");
         //        Serial.print(base_ctrlLoop.Setpoint);
         //        Serial.print('\n');
       }
+    } 
+    else if (string_id == "Y")//Y motor selected
+     { 
+      if (value == "H") 
+        {
+          Y_ctrlLoop.homing();
+          base_ctrlLoop.homing(); 
+        }
+      else if(value == "R")
+      {
 
-    } else if (string_id == "Y")//Y motor selected
-      if (value == "H") {
-        Y_ctrlLoop.homing();
-
-      } else
+      }
+      else
       {
         double Y_gear_ratio = Y_motor.gear_ratio;
         Y_ctrlLoop.Setpoint = desiredPosition * Y_gear_ratio;//for Y motor (Y control loop)
-
-        //        Serial.print("MCD,Y,");
-        //        Serial.print(Y_ctrlLoop.Setpoint);
-        //        Serial.print('\n');
+      
       }
-  } else if (device == "E") //encoder command
+     } 
+  } 
+  else if (device == "E") //encoder command
   {
     if (string_id == "B")
     {
@@ -140,11 +140,14 @@ void execute_command(String command)
     }
   } else //invalid command
   {
-    Serial.print("Invalid command. Format must be: Device,ID,Position ");
-    Serial.print('\n');
+//    Serial.print("Invalid command. Format must be: Device,ID,Position ");
+//    Serial.print('\n');
   }
 
-
+  device = "";
+  string_id = "";
+  value = "";
+  
 }
 
 void printIfCloseEnough(CtrlLoop control_loop)//prints back done signal when motor is close enough to desired position
