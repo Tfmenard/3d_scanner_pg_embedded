@@ -71,15 +71,6 @@ void loop() {
 
   X_ctrlLoop.sendFBackStreamIfMoving();
   servo_ctrlLoop.sendFBackStreamIfMoving();
-  
-  //send motor done signal if motor is close enough
-  if (device == "M")
-  {
-    if (string_id == "X")
-    {
-      //printIfCloseEnough(X_ctrlLoop);
-    }
-  }
 
 
 }
@@ -132,7 +123,7 @@ void execute_command(String command)
         servo_motor.write(desiredPosition);
         servo_motor_fake.isMoving = true;
         delay(2000);//camera delay
-  
+        
         //Serial.print("MCD,S,");
         //Serial.print(servo_motor.read());
         //Serial.print('\n');

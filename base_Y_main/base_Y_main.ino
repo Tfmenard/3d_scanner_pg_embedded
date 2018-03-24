@@ -76,20 +76,6 @@ void loop() {
   Y_ctrlLoop.sendFBackStreamIfMoving();
   base_ctrlLoop.sendFBackStreamIfMoving();
 
-  //send motor done signal if motor is close enough.
-  //TODO: Implement asynchronous on receiving to use this asynchronous motor done command.
-  if (device == "M")
-  {
-    if (string_id == "B")
-    {
-      //printIfCloseEnough(base_ctrlLoop);
-    }
-    else if (string_id == "Y")
-    {
-      //printIfCloseEnough(Y_ctrlLoop);
-    }
-  } 
-
 }
 
 void execute_command(String command)
@@ -106,11 +92,7 @@ void execute_command(String command)
   {
     if (string_id == "B")// Base motor selected
     {
-      if (value == "H") 
-      {
-        base_ctrlLoop.homing();
-      } 
-      else if(value == "R")
+      if(value == "R")
       {
         base_ctrlLoop.motor->isMoving = false; 
       }
@@ -131,7 +113,7 @@ void execute_command(String command)
       if (value == "H") 
       {
         Y_ctrlLoop.homing();
-
+        base_ctrlLoop.homing();
       }
       else if(value == "R")
       {
