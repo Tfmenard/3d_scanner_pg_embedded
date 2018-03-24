@@ -21,7 +21,7 @@
 #include RELATIVE_PATH(CtrlLoop.cpp)
 #include RELATIVE_PATH(Motor.h)
 #include RELATIVE_PATH(Motor.cpp)
- 
+
 #include <Servo.h>
 
 int PWM_pin_X = 2;
@@ -36,17 +36,17 @@ CtrlLoop X_ctrlLoop('B', &X_encoder, &X_motor, Kp, Ki, Kd);
 Motor servo_motor_fake('S', '1', 'd');
 CtrlLoop servo_ctrlLoop('S', &X_encoder, &servo_motor_fake, Kp, Ki, Kd);
 
-
 String PC_input, device, string_id, value;
 double desiredPosition;
 double positionThreshold = 0.6;
 char id;
 long encoder_position;
+int switchPin = 30;
 
 
 void setup() {
   Serial.begin(115200);
-
+  pinMode(switchPin, INPUT_PULLUP);
   X_ctrlLoop.updatePosition();
 
   servo_motor.attach(11);//attaches servo on pin 11 to the servo object.
@@ -66,13 +66,14 @@ void loop() {
     execute_command(PC_input);//here parse pc command and execute it
   }
 
+  X_ctrlLoop.checkIfHomingDone(switchPin);
+
   pidComputedX = X_ctrlLoop.pid->Compute();//must run once in every void loop iteration
   analogWrite(PWM_pin_X, X_ctrlLoop.Output);
-
+  
   X_ctrlLoop.sendFBackStreamIfMoving();
   servo_ctrlLoop.sendFBackStreamIfMoving();
-
-
+  
 }
 
 void execute_command(String command)
@@ -90,9 +91,12 @@ void execute_command(String command)
   {
     if (string_id == "X")// X motor selected
     {
-      if (value == "H")
+      if (value == "H")//here add code to do homing of servo then homing of control loop - both together.
       {
+        servo_motor.write(90);
+        delay(2000);//camera delay
         X_ctrlLoop.homing();
+
       }
       else if(value == "R")
       {
@@ -140,10 +144,10 @@ void execute_command(String command)
 
     } 
     else if (string_id == "S")
+
     {
-      Serial.print("ECD,S,");
-      Serial.print(servo_motor.read());
-      Serial.print('\n');
+      //    Serial.print("Invalid command. Format must be: Device,ID,Position ");
+      //    Serial.print('\n');
     }
   }  
   else //invalid command
@@ -152,7 +156,9 @@ void execute_command(String command)
     //Serial.print('\n');
   }
 
-
+  device == "";
+  string_id == "";
+  value == "";
 }
 
 void printIfCloseEnough(CtrlLoop control_loop)//prints back done signal when motor is close enough to desired position

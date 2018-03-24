@@ -41,6 +41,7 @@ double desiredPosition;
 double positionThreshold = 0.6;
 char id;
 long encoder_position;
+int switchPin = 30;
 
 void setup() {
   
@@ -48,9 +49,10 @@ void setup() {
 
   base_ctrlLoop.updatePosition();
   Y_ctrlLoop.updatePosition();
+  pinMode(switchPin, INPUT_PULLUP);
 
   //Serial.println("Ready");
-  
+ 
 }
 
 void loop() {
@@ -66,7 +68,9 @@ void loop() {
     execute_command(PC_input);//here parse pc command and execute it
 
   }
-
+  
+  Y_ctrlLoop.checkIfHomingDone(switchPin);
+  
   pidComputedBase = base_ctrlLoop.pid->Compute();//must run once in every void loop iteration
   pidComputedY = Y_ctrlLoop.pid->Compute();//must run once in every void loop iteration
 
@@ -106,15 +110,14 @@ void execute_command(String command)
         //        Serial.print(base_ctrlLoop.Setpoint);
         //        Serial.print('\n');
       }
-
     } 
     else if (string_id == "Y")//Y motor selected
-    {
+     { 
       if (value == "H") 
-      {
-        Y_ctrlLoop.homing();
-        base_ctrlLoop.homing();
-      }
+        {
+          Y_ctrlLoop.homing();
+          base_ctrlLoop.homing(); 
+        }
       else if(value == "R")
       {
         Y_ctrlLoop.motor->isMoving = false; 
@@ -150,7 +153,10 @@ void execute_command(String command)
     //Serial.print('\n');
   }
 
-
+  device = "";
+  string_id = "";
+  value = "";
+  
 }
 
 void printIfCloseEnough(CtrlLoop control_loop)//prints back done signal when motor is close enough to desired position

@@ -20,9 +20,10 @@ public:
 	long oldPosition = -999;
 	long newPosition = -999;
 	char id;
+	bool isHoming = false;	
 	double posThreshold = 1;
 	int streamCounter = 0;
-	
+
 	Encoder *encoder;
 	PID *pid;
 	Motor *motor;
@@ -31,7 +32,7 @@ public:
 	CtrlLoop(char id, Encoder *mEncoder, Motor *_motor, double K_p, double K_i, double K_d);
 	CtrlLoop(char _id, Encoder *mEncoder, Motor *_motor, PID *_pid, double &_Setpoint, double &_Input, double &_Output);
 	void updatePosition();
-
+	void checkIfHomingDone(int switchPin);
 	void findMotorDirection();
 	bool updatePID();
 

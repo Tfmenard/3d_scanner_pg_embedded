@@ -66,21 +66,31 @@ void CtrlLoop::findMotorDirection()
 
 void CtrlLoop::homing()
 {
-	this->pid->SetMode(MANUAL);
-
-	this->motor->pwm = 100;
-	this->motor->goBackward();
+	isHoming = true;
+	Setpoint = (-999999);//arbitrary long distance
 	
-	while (digitalRead(30) == 0)
+	if (id = 'B')
 	{
-	}
+		encoder->write(0);
+          Setpoint = 0;
+          isHoming = false;
 
-	encoder->write(0);
-	Setpoint = 0;
-	
-	this->motor->stopMotor();
-	this ->pid->SetMode(AUTOMATIC);
+	}
 }
+
+void CtrlLoop::checkIfHomingDone(int switchPin)
+{
+	if (digitalRead(switchPin) != 0 && (isHoming) )
+  {
+          encoder->write(0);
+          Setpoint = 0;
+          isHoming = false;
+ 
+          //Serial.print("switch activated homing");
+          //Serial.print('\n');
+   }
+}
+
 
 void CtrlLoop::sendFBackStreamIfMoving()//Streams encoder position only when the motor is moving
 {
@@ -88,7 +98,7 @@ void CtrlLoop::sendFBackStreamIfMoving()//Streams encoder position only when the
   if(motor->isMoving && close_enough)
   {
     //Send current position status
-	sendFeedBackStatus("ECD,");
+	  sendFeedBackStatus("ECD,");
   }
   
   if (close_enough)
@@ -98,7 +108,7 @@ void CtrlLoop::sendFBackStreamIfMoving()//Streams encoder position only when the
   }
   else if(motor->isMoving && !close_enough)
   {
-	    //Send current position status
+	   //Send current position status
 		sendFeedBackStatus("ECD,");
   }
 }
