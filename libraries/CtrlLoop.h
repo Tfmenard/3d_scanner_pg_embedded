@@ -21,6 +21,9 @@ public:
 	long newPosition = -999;
 	char id;
 	bool isHoming = false;	
+	double posThreshold = 1;
+	int streamCounter = 0;
+
 	Encoder *encoder;
 	PID *pid;
 	Motor *motor;
@@ -40,6 +43,8 @@ public:
 	void setMotorDirection(char inputMotorDirection);
 	void setupPins();
 	void stopMotor();
+	void sendFBackStreamIfMoving();
+	void sendFeedBackStatus(String cmd_id);
 
 	//functions not used:
 	//void goToPosition(double desiredPosition);
