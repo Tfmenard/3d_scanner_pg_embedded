@@ -10,7 +10,7 @@
 */
 
 // Change this path to include libraries
-#define PROJECT_ROOT C:\Users\Gabriel\Desktop\Deberes McGill\DP2\Github\3d_scanner_pg_embedded\libraries
+#define PROJECT_ROOT C:\Users\Jeslan Rajendram\Documents\3d_scanner_pg_embedded\libraries
 #define TO_STRING(s) #s
 #define ABSOLUTE_PATH(root, relative_path) TO_STRING(root\relative_path)
 #define RELATIVE_PATH(library) ABSOLUTE_PATH(PROJECT_ROOT, library)
@@ -74,8 +74,14 @@ void loop() {
   
   pidComputedBase = base_ctrlLoop.pid->Compute();//must run once in every void loop iteration
   pidComputedY = Y_ctrlLoop.pid->Compute();//must run once in every void loop iteration
-
-  analogWrite(PWM_pin_Y, Y_ctrlLoop.Output);
+  int out = Y_ctrlLoop.Output;
+  if(out >= 10){
+    analogWrite(PWM_pin_Y, 0.99*out);
+  }
+  else{
+    analogWrite(PWM_pin_Y, 0);
+  }
+  //analogWrite(PWM_pin_Y, 0.99*Y_ctrlLoop.Output);
   analogWrite(PWM_pin_base, base_ctrlLoop.Output);
 
   //Y_ctrlLoop.sendFBackStreamIfMoving();
