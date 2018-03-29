@@ -75,12 +75,20 @@ void loop() {
   pidComputedBase = base_ctrlLoop.pid->Compute();//must run once in every void loop iteration
   pidComputedY = Y_ctrlLoop.pid->Compute();//must run once in every void loop iteration
 
-  analogWrite(PWM_pin_Y, Y_ctrlLoop.Output);
-  analogWrite(PWM_pin_base, base_ctrlLoop.Output);
-
-  Y_ctrlLoop.sendFBackStreamIfMoving();
-  base_ctrlLoop.sendFBackStreamIfMoving(); 
-
+  int out = Y_ctrlLoop.Output;
+  if(out >= 10)
+  {
+      analogWrite(PWM_pin_Y, 0.99*out);
+  }
+  else
+  {
+      analogWrite(PWM_pin_Y, 0);
+  }
+    analogWrite(PWM_pin_base, base_ctrlLoop.Output);
+  
+    Y_ctrlLoop.sendFBackStreamIfMoving();
+    base_ctrlLoop.sendFBackStreamIfMoving(); 
+  
 }
 
 void execute_command(String command)

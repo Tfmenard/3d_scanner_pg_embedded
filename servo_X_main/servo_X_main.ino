@@ -69,7 +69,16 @@ void loop() {
   X_ctrlLoop.checkIfHomingDone(switchPin);
 
   pidComputedX = X_ctrlLoop.pid->Compute();//must run once in every void loop iteration
-  analogWrite(PWM_pin_X, X_ctrlLoop.Output);
+ 
+  int out = X_ctrlLoop.Output;
+  if(out >= 10)
+  {
+      analogWrite(PWM_pin_X, out);
+  }
+  else
+  {
+      analogWrite(PWM_pin_X, 0);
+  }
   
   X_ctrlLoop.sendFBackStreamIfMoving();
   servo_ctrlLoop.sendFBackStreamIfMoving();
