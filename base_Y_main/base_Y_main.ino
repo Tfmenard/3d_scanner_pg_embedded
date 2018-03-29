@@ -10,7 +10,7 @@
 */
 
 // Change this path to include libraries
-#define PROJECT_ROOT C:\Users\Gabriel\Desktop\Deberes McGill\DP2\Github\3d_scanner_pg_embedded\libraries
+#define PROJECT_ROOT C:\Users\Tfmenard\Documents\GitHub\3d_scanner_pg_embedded\libraries
 #define TO_STRING(s) #s
 #define ABSOLUTE_PATH(root, relative_path) TO_STRING(root\relative_path)
 #define RELATIVE_PATH(library) ABSOLUTE_PATH(PROJECT_ROOT, library)
@@ -78,8 +78,8 @@ void loop() {
   analogWrite(PWM_pin_Y, Y_ctrlLoop.Output);
   analogWrite(PWM_pin_base, base_ctrlLoop.Output);
 
-  //Y_ctrlLoop.sendFBackStreamIfMoving();
-  //base_ctrlLoop.sendFBackStreamIfMoving();
+  Y_ctrlLoop.sendFBackStreamIfMoving();
+  base_ctrlLoop.sendFBackStreamIfMoving(); 
 
 }
 
@@ -99,7 +99,8 @@ void execute_command(String command)
     {
       if(value == "R")
       {
-        base_ctrlLoop.motor->isMoving = false; 
+        base_ctrlLoop.motor->isMoving = false;
+        base_ctrlLoop.homingTerminated = false;  
       }
       else
       {
@@ -122,6 +123,7 @@ void execute_command(String command)
       else if(value == "R")
       {
         Y_ctrlLoop.motor->isMoving = false; 
+        Y_ctrlLoop.homingTerminated = false; 
       }
       else
       {
