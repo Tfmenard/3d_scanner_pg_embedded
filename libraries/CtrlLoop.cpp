@@ -65,17 +65,31 @@ void CtrlLoop::findMotorDirection()
 
 
 void CtrlLoop::homing()
+{	
+
+isHoming = true;
+homingTerminated = false;
+motor->isMoving = true;
+
+	if (id == 'Y')
 {
-	isHoming = true;
+
+Setpoint = (999999);//to ensure that Y motor rotates in the right direction
+} 
+else
+{
 	Setpoint = (-999999);//arbitrary long distance
 	
-	if (id = 'B')
+	if (id == 'B')
 	{
 		encoder->write(0);
           Setpoint = 0;
           isHoming = false;
+		  motor->isMoving = false;
+		  homingTerminated = false;
 
 	}
+}
 }
 
 void CtrlLoop::checkIfHomingDone(int switchPin)
@@ -85,6 +99,7 @@ void CtrlLoop::checkIfHomingDone(int switchPin)
           encoder->write(0);
           Setpoint = 0;
           isHoming = false;
+		  homingTerminated = true;
  
           //Serial.print("switch activated homing");
           //Serial.print('\n');
@@ -95,21 +110,31 @@ void CtrlLoop::checkIfHomingDone(int switchPin)
 void CtrlLoop::sendFBackStreamIfMoving()//Streams encoder position only when the motor is moving
 {
   bool close_enough = (Input > (Setpoint - posThreshold)) && (Input  < (Setpoint + posThreshold));
-  if(motor->isMoving && close_enough)
+
+  if(homingTerminated && motor->isMoving)
+  {
+	  //Send current position status
+	  sendFeedBackStatus("HCD,");
+  }
+  else if(motor->isMoving)
+  {
+	   //Send current position status
+		sendFeedBackStatus("ECD,");
+  }
+  
+}
+
+void CtrlLoop::sendFBackStreamHoming()//Streams encoder position only when the motor is moving
+{
+  if(motor->isMoving && isHoming)
   {
     //Send current position status
 	  sendFeedBackStatus("ECD,");
   }
-  
-  if (close_enough)
-  {
-    
-    //do nothing
-  }
-  else if(motor->isMoving && !close_enough)
+  else if(homingTerminated && motor->isMoving)
   {
 	   //Send current position status
-		sendFeedBackStatus("ECD,");
+		sendFeedBackStatus("HCD,");
   }
 }
 
@@ -119,7 +144,7 @@ void CtrlLoop::sendFeedBackStatus(String cmd_id)
 	String cmdStringHead = cmd_id;
 	cmdStringHead += motor->motorID;
 	cmdStringHead += ',';
-	double posAsDouble = Input/motor->gear_ratio;
+	double posAsDouble = abs(Input/motor->gear_ratio);
 	uint16_t posAsUint16 = static_cast<uint16_t>(posAsDouble + 0.5);
 	String cmdStringTail = ",";
 	char startMsgChar = '{';
@@ -139,4 +164,5 @@ void CtrlLoop::sendFeedBackStatus(String cmd_id)
 	Serial.write(posTail);
 	Serial.print(cmdStringTail);
 	Serial.write(endMsgChar);
+
 }

@@ -21,6 +21,7 @@ public:
 	long newPosition = -999;
 	char id;
 	bool isHoming = false;	
+	bool homingTerminated = false;
 	double posThreshold = 1;
 	int streamCounter = 0;
 
@@ -44,6 +45,7 @@ public:
 	void setupPins();
 	void stopMotor();
 	void sendFBackStreamIfMoving();
+	void sendFBackStreamHoming();
 	void sendFeedBackStatus(String cmd_id);
 
 	//functions not used:

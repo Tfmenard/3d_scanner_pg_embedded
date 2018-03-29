@@ -12,7 +12,6 @@
 
 // Change this path to include libraries
 #define PROJECT_ROOT C:\Users\Tfmenard\Documents\GitHub\3d_scanner_pg_embedded\libraries
-
 #define TO_STRING(s) #s
 #define ABSOLUTE_PATH(root, relative_path) TO_STRING(root\relative_path)
 #define RELATIVE_PATH(library) ABSOLUTE_PATH(PROJECT_ROOT, library)
@@ -21,6 +20,7 @@
 #include RELATIVE_PATH(CtrlLoop.cpp)
 #include RELATIVE_PATH(Motor.h)
 #include RELATIVE_PATH(Motor.cpp)
+
 
 #include <Servo.h>
 
@@ -31,7 +31,7 @@ Servo servo_motor;
 
 bool pidComputedX = false;
 Motor X_motor('X', '1', 'd');
-CtrlLoop X_ctrlLoop('B', &X_encoder, &X_motor, Kp, Ki, Kd);
+CtrlLoop X_ctrlLoop('X', &X_encoder, &X_motor, Kp, Ki, Kd);
 
 Motor servo_motor_fake('S', '1', 'd');
 CtrlLoop servo_ctrlLoop('S', &X_encoder, &servo_motor_fake, Kp, Ki, Kd);
@@ -51,7 +51,7 @@ void setup() {
 
   servo_motor.attach(11);//attaches servo on pin 11 to the servo object.
 
-  //Serial.println("Ready");
+  Serial.println("Ready");
 
 }
 
@@ -69,7 +69,16 @@ void loop() {
   X_ctrlLoop.checkIfHomingDone(switchPin);
 
   pidComputedX = X_ctrlLoop.pid->Compute();//must run once in every void loop iteration
-  analogWrite(PWM_pin_X, X_ctrlLoop.Output);
+ 
+  int out = X_ctrlLoop.Output;
+  if(out >= 10)
+  {
+      analogWrite(PWM_pin_X, out);
+  }
+  else
+  {
+      analogWrite(PWM_pin_X, 0);
+  }
   
   X_ctrlLoop.sendFBackStreamIfMoving();
   servo_ctrlLoop.sendFBackStreamIfMoving();
@@ -100,7 +109,8 @@ void execute_command(String command)
       }
       else if(value == "R")
       {
-        X_ctrlLoop.motor->isMoving = false; 
+        X_ctrlLoop.motor->isMoving = false;
+        X_ctrlLoop.homingTerminated = false; 
       }
       else
       {
