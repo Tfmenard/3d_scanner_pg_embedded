@@ -46,6 +46,11 @@ Motor::Motor(char id, char mDirection, char mPosition)
   	pwm_pin = 3;
 	gear_ratio = 175.618569;
   }
+  else if(motorID == 'S')
+  {
+	  gear_ratio = 1;
+  }
+  
   if(motorID != 'S')
   {
 	 setupPins();

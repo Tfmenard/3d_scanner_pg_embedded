@@ -124,6 +124,25 @@ void CtrlLoop::sendFBackStreamIfMoving()//Streams encoder position only when the
   
 }
 
+void CtrlLoop::sendFBackStreamIfMoving(double currentPosition)//Streams encoder position only when the motor is moving
+{
+  Input = currentPosition;
+  
+  bool close_enough = (Input > (Setpoint - posThreshold)) && (Input  < (Setpoint + posThreshold));
+
+  if(homingTerminated && motor->isMoving)
+  {
+	  //Send current position status
+	  sendFeedBackStatus("HCD,");
+  }
+  else if(motor->isMoving)
+  {
+	   //Send current position status
+		sendFeedBackStatus("ECD,");
+  }
+  
+}
+
 void CtrlLoop::sendFBackStreamHoming()//Streams encoder position only when the motor is moving
 {
   if(motor->isMoving && isHoming)
@@ -164,5 +183,6 @@ void CtrlLoop::sendFeedBackStatus(String cmd_id)
 	Serial.write(posTail);
 	Serial.print(cmdStringTail);
 	Serial.write(endMsgChar);
+	
 
 }

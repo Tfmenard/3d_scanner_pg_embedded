@@ -81,7 +81,7 @@ void loop() {
   }
   
   X_ctrlLoop.sendFBackStreamIfMoving();
-  servo_ctrlLoop.sendFBackStreamIfMoving();
+  servo_ctrlLoop.sendFBackStreamIfMoving(servo_motor.read());
   
 }
 
@@ -137,6 +137,7 @@ void execute_command(String command)
         servo_motor.write(desiredPosition);
         servo_motor_fake.isMoving = true;
         delay(2000);//camera delay
+        servo_ctrlLoop.Setpoint = desiredPosition;
         
         //Serial.print("MCD,S,");
         //Serial.print(servo_motor.read());
@@ -156,8 +157,9 @@ void execute_command(String command)
     else if (string_id == "S")
 
     {
-      //    Serial.print("Invalid command. Format must be: Device,ID,Position ");
-      //    Serial.print('\n');
+      Serial.print("ECD,S,");
+      Serial.print(servo_ctrlLoop.Input);
+      Serial.print('\n');
     }
   }  
   else //invalid command

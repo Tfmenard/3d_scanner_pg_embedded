@@ -45,6 +45,7 @@ public:
 	void setupPins();
 	void stopMotor();
 	void sendFBackStreamIfMoving();
+	void sendFBackStreamIfMoving(double currentPosition);
 	void sendFBackStreamHoming();
 	void sendFeedBackStatus(String cmd_id);
 

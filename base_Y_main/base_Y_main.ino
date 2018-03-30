@@ -56,6 +56,9 @@ void setup() {
 
 void loop() {
 
+  Y_ctrlLoop.sendFBackStreamIfMoving();
+  base_ctrlLoop.sendFBackStreamIfMoving(); 
+
   base_ctrlLoop.updatePosition();
   Y_ctrlLoop.updatePosition();
   base_ctrlLoop.findMotorDirection();
@@ -75,19 +78,24 @@ void loop() {
   pidComputedBase = base_ctrlLoop.pid->Compute();//must run once in every void loop iteration
   pidComputedY = Y_ctrlLoop.pid->Compute();//must run once in every void loop iteration
 
-  int out = Y_ctrlLoop.Output;
-  if(out >= 10)
+  if(Y_ctrlLoop.Output >= 100.0)
   {
-      analogWrite(PWM_pin_Y, 0.99*out);
+      analogWrite(PWM_pin_Y, 0.99*Y_ctrlLoop.Output);
   }
   else
   {
       analogWrite(PWM_pin_Y, 0);
   }
-    analogWrite(PWM_pin_base, base_ctrlLoop.Output);
+
+  if(base_ctrlLoop.Output >= 10.0)
+  {
+      analogWrite(PWM_pin_base, 0.99*base_ctrlLoop.Output);
+  }
+  else
+  {
+      analogWrite(PWM_pin_base, 0);
+  }
   
-    Y_ctrlLoop.sendFBackStreamIfMoving();
-    base_ctrlLoop.sendFBackStreamIfMoving(); 
   
 }
 
@@ -105,7 +113,11 @@ void execute_command(String command)
   {
     if (string_id == "B")// Base motor selected
     {
-      if(value == "R")
+      if(value == "H")
+      {
+        base_ctrlLoop.homing();
+      }
+      else if(value == "R")
       {
         base_ctrlLoop.motor->isMoving = false;
         base_ctrlLoop.homingTerminated = false;  
