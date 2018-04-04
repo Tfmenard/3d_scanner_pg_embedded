@@ -37,7 +37,7 @@ Motor::Motor(char id, char mDirection, char mPosition)
   	InA = 26;
   	InB = 27;
   	pwm_pin = 2;
-  	gear_ratio = 5.688888889;
+  	gear_ratio = 5.688888889*2;
   }
   else if(motorID == 'Y')
   {

@@ -134,11 +134,18 @@ void execute_command(String command)
       }
       else
       {
+        
+
+        servoMove(desiredPosition, servo_motor.read());//divide desiredPosition/2 and multiply *2 .read()?
+        servo_motor_fake.isMoving = true;
+        delay(2000);//camera delay
+        servo_ctrlLoop.Setpoint = desiredPosition;
+        /*
         servo_motor.write(desiredPosition);
         servo_motor_fake.isMoving = true;
         delay(2000);//camera delay
         servo_ctrlLoop.Setpoint = desiredPosition;
-        
+        */
         //Serial.print("MCD,S,");
         //Serial.print(servo_motor.read());
         //Serial.print('\n');
@@ -206,4 +213,30 @@ String getValue(String data, char separator, int index)//this method is used to 
     }
   }
   return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
+}
+
+void servoMove(double desiredAngle, double currentAngle)//range of servo is 50~160//the new servo is 0  to 180: 
+{
+   double pos = 0; //initial servo position is 93
+   
+   if (desiredAngle > currentAngle)//if desired position is bigger than current position
+   { 
+    for (pos = currentAngle; pos <= desiredAngle; pos += 1) 
+    { 
+      servo_motor.write(pos);              // tell servo to go to position in variable 'pos'
+      delay(15);                       // waits 15ms for the servo to reach the position
+    }
+   } 
+   else if(desiredAngle < currentAngle)
+   {
+    for (pos = currentAngle; pos >= desiredAngle; pos -= 1)
+    { 
+      servo_motor.write(pos);              // tell servo to go to position in variable 'pos'
+      delay(15);                       // waits 15ms for the servo to reach the position
+    }
+   } 
+   else
+    {
+      //do nothing
+    }
 }
